@@ -8,7 +8,7 @@ project(
 
 add_executable(MoltenEngine 
     main.cpp
-)
+ "App.cpp")
 
 set_target_properties(MoltenEngine PROPERTIES
     CXX_STANDARD 17
