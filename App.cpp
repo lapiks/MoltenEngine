@@ -1,9 +1,9 @@
-#include "App.h"
+#include "app.h"
 
 #include <GLFW/glfw3.h>
 #include <cstdlib>
 
-int App::run()
+int App::Run()
 {
     if (!glfwInit()) {
         return EXIT_FAILURE;

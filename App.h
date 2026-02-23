@@ -2,5 +2,5 @@ class App {
 private:
 
 public:
-	int run();
+	int Run();
 };
