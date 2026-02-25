@@ -1,27 +1,20 @@
 #include "app.h"
 
-#include <GLFW/glfw3.h>
+#include "Platform/Window.h"
 #include <cstdlib>
 
 int App::Run()
 {
-    if (!glfwInit()) {
+    Window window;
+    if (!window.Create(640, 480)) {
         return EXIT_FAILURE;
     }
 
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
-    GLFWwindow* window = glfwCreateWindow(640, 480, "Molten Engine", NULL, NULL);
-    if (!window) {
-        return EXIT_FAILURE;
+    while (!window.ShouldClose()) {
+        window.PollEvents();
     }
 
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-    }
-
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    window.Destroy();
 
     return EXIT_SUCCESS;
 }
