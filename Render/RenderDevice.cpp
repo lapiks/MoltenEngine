@@ -1,9 +1,21 @@
 #include "RenderDevice.h"
 
 #include <print>
+#include <iostream>
 #include <vulkan/vulkan.h>
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
+
+inline bool VK_CHECK_BOOL(VkResult result, const char* msg) {
+    if (result != VK_SUCCESS) {
+        std::cerr << "Vulkan error: " << msg << " (VkResult=" << result << ")\n";
+        return false;
+    }
+    return true;
+}
+
+#define VK_CHECK_RETURN(x) \
+    do { if (!VK_CHECK_BOOL((x), #x)) return false; } while(0)
 
 bool RenderDevice::Initialize(const std::vector<const char*>& instanceExtensions) {
     std::println("Initializing Vulkan");
@@ -22,10 +34,10 @@ bool RenderDevice::Initialize(const std::vector<const char*>& instanceExtensions
         };
 
     VkInstance instance;
-    vkCreateInstance(&instanceCI, nullptr, &instance);
+    VK_CHECK_RETURN(vkCreateInstance(&instanceCI, nullptr, &instance));
 
     uint32_t deviceCount{ 0 };
-    vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+    VK_CHECK_RETURN(vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr));
 
     if (deviceCount < 1) {
         std::println("No physical device");
@@ -34,7 +46,7 @@ bool RenderDevice::Initialize(const std::vector<const char*>& instanceExtensions
 
     uint32_t deviceIndex{ 0 };
     std::vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+    VK_CHECK_RETURN(vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data()));
     VkPhysicalDeviceProperties2 deviceProperties{ .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2 };
     vkGetPhysicalDeviceProperties2(devices[deviceIndex], &deviceProperties);
 
@@ -90,7 +102,7 @@ bool RenderDevice::Initialize(const std::vector<const char*>& instanceExtensions
         .pEnabledFeatures = &enabledVk10Features
     };
     VkDevice device;
-    vkCreateDevice(devices[deviceIndex], &deviceCI, nullptr, &device);
+    VK_CHECK_RETURN(vkCreateDevice(devices[deviceIndex], &deviceCI, nullptr, &device));
 
     VkQueue queue;
     vkGetDeviceQueue(device, queueFamily, 0, &queue);
@@ -108,7 +120,7 @@ bool RenderDevice::Initialize(const std::vector<const char*>& instanceExtensions
         .instance = instance
     };
     VmaAllocator allocator;
-    vmaCreateAllocator(&allocatorCI, &allocator);
+    VK_CHECK_RETURN(vmaCreateAllocator(&allocatorCI, &allocator));
 
     return true;
 }
