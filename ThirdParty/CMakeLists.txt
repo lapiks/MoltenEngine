@@ -5,10 +5,13 @@ add_subdirectory(imgui-1.92.6)
 
 add_library(ThirdParty INTERFACE)
 
+find_package(Vulkan REQUIRED)
+
 target_link_libraries(ThirdParty
     INTERFACE
         glfw
         glm
         flecs::flecs_static
         imgui
+        Vulkan::Vulkan
 )
