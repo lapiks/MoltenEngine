@@ -8,7 +8,7 @@ project(
 
 add_executable(MoltenEngine 
     main.cpp
- "App.cpp" "Platform/Window.h" "Platform/Window.cpp")
+ "App.cpp" "Platform/Window.h" "Platform/Window.cpp" "Engine/Engine.h" "Engine/Engine.cpp"   "Physics/PhysicsSystem.h" "Render/RenderSystem.h" "Core/Time.h" "Core/Time.cpp")
 
 set_target_properties(MoltenEngine PROPERTIES
     CXX_STANDARD 17
@@ -18,5 +18,10 @@ set_target_properties(MoltenEngine PROPERTIES
 )
 
 add_subdirectory(ThirdParty)
+
+target_include_directories(MoltenEngine
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}
+)
 
 target_link_libraries(MoltenEngine PRIVATE ThirdParty)

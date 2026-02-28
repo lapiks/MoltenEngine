@@ -1,7 +1,9 @@
 #include "app.h"
 
-#include "Platform/Window.h"
 #include <cstdlib>
+
+#include "Platform/Window.h"
+#include "Engine/Engine.h"
 
 int App::Run()
 {
@@ -10,10 +12,17 @@ int App::Run()
         return EXIT_FAILURE;
     }
 
+    Engine engine;
+    engine.Initialize();
+
     while (!window.ShouldClose()) {
         window.PollEvents();
+
+        engine.Update();
+        engine.Render();
     }
 
+    engine.Shutdown();
     window.Destroy();
 
     return EXIT_SUCCESS;
