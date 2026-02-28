@@ -1,3 +1,5 @@
+#include <vector>
+
 struct TextureDesc {
 
 };
@@ -17,7 +19,7 @@ struct ShaderDesc {
 class RenderDevice {
 public:
 	// Init
-	void Initialize();
+	bool Initialize(const std::vector<const char*>& instanceExtensions);
 	void Shutdown();
 
 	// Resources creation

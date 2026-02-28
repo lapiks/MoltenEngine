@@ -32,3 +32,10 @@ bool Window::ShouldClose() const {
 void Window::PollEvents() const {
     glfwPollEvents();
 }
+
+std::vector<const char*> Window::GetRequiredInstanceExtensions() const {
+    uint32_t count = 0;
+    const char** extensions = glfwGetRequiredInstanceExtensions(&count);
+
+    return std::vector<const char*>(extensions, extensions + count);
+}
