@@ -1,5 +1,7 @@
 #include "RenderDevice.h"
 
+#include "Platform/Window.h"
+
 #include <print>
 #include <iostream>
 #include <vulkan/vulkan.h>
@@ -17,7 +19,7 @@ inline bool VK_CHECK_BOOL(VkResult result, const char* msg) {
 #define VK_CHECK_RETURN(x) \
     do { if (!VK_CHECK_BOOL((x), #x)) return false; } while(0)
 
-bool RenderDevice::Initialize(const std::vector<const char*>& instanceExtensions) {
+bool RenderDevice::Initialize(const Window& window) {
     std::println("Initializing Vulkan");
 
     VkApplicationInfo appInfo{
@@ -25,6 +27,8 @@ bool RenderDevice::Initialize(const std::vector<const char*>& instanceExtensions
         .pApplicationName = "Molten Engine",
         .apiVersion = VK_API_VERSION_1_3
     };
+
+    auto instanceExtensions = window.GetRequiredInstanceExtensions();
 
     VkInstanceCreateInfo instanceCI{
         .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
@@ -121,6 +125,9 @@ bool RenderDevice::Initialize(const std::vector<const char*>& instanceExtensions
     };
     VmaAllocator allocator;
     VK_CHECK_RETURN(vmaCreateAllocator(&allocatorCI, &allocator));
+
+    VkSurfaceKHR surface;
+    VK_CHECK_RETURN(window.CreateSurface(instance, surface));
 
     return true;
 }

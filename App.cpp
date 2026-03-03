@@ -12,12 +12,10 @@ int App::Run()
         return EXIT_FAILURE;
     }
 
-    EngineConfig config{
-        .instanceExtensions = window.GetRequiredInstanceExtensions()
-    };
+    EngineConfig config;
 
     Engine engine;
-    engine.Initialize(config);
+    engine.Initialize(window, config);
 
     while (!window.ShouldClose()) {
         window.PollEvents();

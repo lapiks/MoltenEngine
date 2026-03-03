@@ -39,3 +39,7 @@ std::vector<const char*> Window::GetRequiredInstanceExtensions() const {
 
     return std::vector<const char*>(extensions, extensions + count);
 }
+
+VkResult Window::CreateSurface(VkInstance instance, VkSurfaceKHR& surface) const {
+    return glfwCreateWindowSurface(instance, m_window, NULL, &surface);
+}

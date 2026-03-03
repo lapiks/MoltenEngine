@@ -16,10 +16,12 @@ struct ShaderDesc {
 
 };
 
+class Window;
+
 class RenderDevice {
 public:
 	// Init
-	bool Initialize(const std::vector<const char*>& instanceExtensions);
+	bool Initialize(const Window& window);
 	void Shutdown();
 
 	// Resources creation
