@@ -25,6 +25,14 @@ void Window::Destroy() {
     glfwTerminate();
 }
 
+int Window::GetWidth() const {
+    return m_width;
+}
+
+int Window::GetHeight() const {
+    return m_height;
+}
+
 bool Window::ShouldClose() const {
 	return glfwWindowShouldClose(m_window);
 }
