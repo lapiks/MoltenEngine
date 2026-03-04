@@ -5,7 +5,7 @@
 
 #include <cstdlib>
 
-bool Window::Create(int width, int heigth) {
+bool Window::Create(uint32_t width, uint32_t heigth) {
     if (!glfwInit()) {
         return false;
     }
@@ -25,11 +25,11 @@ void Window::Destroy() {
     glfwTerminate();
 }
 
-int Window::GetWidth() const {
+uint32_t Window::GetWidth() const {
     return m_width;
 }
 
-int Window::GetHeight() const {
+uint32_t Window::GetHeight() const {
     return m_height;
 }
 

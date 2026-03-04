@@ -5,10 +5,10 @@ class GLFWwindow;
 
 class Window {
 public:
-	bool Create(int width, int heigth);
+	bool Create(uint32_t width, uint32_t heigth);
 	void Destroy();
-	int GetWidth() const;
-	int GetHeight() const;
+	uint32_t GetWidth() const;
+	uint32_t GetHeight() const;
 	bool ShouldClose() const;
 	void PollEvents() const;
 	std::vector<const char*> GetRequiredInstanceExtensions() const;
@@ -16,6 +16,6 @@ public:
 
 private:
 	GLFWwindow* m_window;
-	int m_width;
-	int m_height;
+	uint32_t m_width;
+	uint32_t m_height;
 };
