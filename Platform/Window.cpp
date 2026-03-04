@@ -17,6 +17,9 @@ bool Window::Create(uint32_t width, uint32_t heigth) {
         return false;
     }
 
+    m_width = width;
+    m_height = heigth;
+
     return true;
 }
 

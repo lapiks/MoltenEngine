@@ -22,6 +22,7 @@ inline bool VK_CHECK_BOOL(VkResult result, const char* msg) {
 bool RenderDevice::Initialize(const Window& window) {
     std::println("Initializing Vulkan");
 
+    // Instance
     VkApplicationInfo appInfo{
         .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
         .pApplicationName = "Molten Engine",
@@ -35,7 +36,7 @@ bool RenderDevice::Initialize(const Window& window) {
         .pApplicationInfo = &appInfo,
         .enabledExtensionCount = (uint32_t)instanceExtensions.size(),
         .ppEnabledExtensionNames = instanceExtensions.data(),
-        };
+    };
 
     VkInstance instance;
     VK_CHECK_RETURN(vkCreateInstance(&instanceCI, nullptr, &instance));
@@ -48,6 +49,7 @@ bool RenderDevice::Initialize(const Window& window) {
         return false;
     }
 
+    // Device
     uint32_t deviceIndex{ 0 };
     std::vector<VkPhysicalDevice> devices(deviceCount);
     VK_CHECK_RETURN(vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data()));
@@ -56,6 +58,7 @@ bool RenderDevice::Initialize(const Window& window) {
 
     std::println("Selected device: {}", deviceProperties.properties.deviceName);
 
+    // Device queue
     uint32_t queueFamilyCount{ 0 };
     vkGetPhysicalDeviceQueueFamilyProperties(devices[deviceIndex], &queueFamilyCount, nullptr);
     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
@@ -96,6 +99,7 @@ bool RenderDevice::Initialize(const Window& window) {
         .samplerAnisotropy = VK_TRUE
     };
 
+    // Logical device
     VkDeviceCreateInfo deviceCI{
         .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
         .pNext = &enabledVk13Features,
@@ -111,6 +115,7 @@ bool RenderDevice::Initialize(const Window& window) {
     VkQueue queue;
     vkGetDeviceQueue(device, queueFamily, 0, &queue);
 
+    // VMA
     VmaVulkanFunctions vkFunctions{
         .vkGetInstanceProcAddr = vkGetInstanceProcAddr,
         .vkGetDeviceProcAddr = vkGetDeviceProcAddr,
@@ -126,12 +131,14 @@ bool RenderDevice::Initialize(const Window& window) {
     VmaAllocator allocator;
     VK_CHECK_RETURN(vmaCreateAllocator(&allocatorCI, &allocator));
 
+    // Surface
     VkSurfaceKHR surface;
     VK_CHECK_RETURN(window.CreateSurface(instance, surface));
 
     VkSurfaceCapabilitiesKHR surfaceCaps{};
     VK_CHECK_RETURN(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(devices[deviceIndex], surface, &surfaceCaps));
 
+    // Swapchain
     const VkFormat imageFormat{ VK_FORMAT_B8G8R8A8_SRGB };
     VkSwapchainCreateInfoKHR swapchainCI{
         .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
@@ -139,7 +146,10 @@ bool RenderDevice::Initialize(const Window& window) {
         .minImageCount = surfaceCaps.minImageCount,
         .imageFormat = imageFormat,
         .imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR,
-        .imageExtent{.width = surfaceCaps.currentExtent.width, .height = surfaceCaps.currentExtent.height },
+        .imageExtent{
+            .width = surfaceCaps.currentExtent.width, 
+            .height = surfaceCaps.currentExtent.height 
+        },
         .imageArrayLayers = 1,
         .imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
         .preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
@@ -150,16 +160,36 @@ bool RenderDevice::Initialize(const Window& window) {
     VkSwapchainKHR swapchain;
     VK_CHECK_RETURN(vkCreateSwapchainKHR(device, &swapchainCI, nullptr, &swapchain));
 
+    // Swapchain images and view
     uint32_t imageCount{ 0 };
     VK_CHECK_RETURN(vkGetSwapchainImagesKHR(device, swapchain, &imageCount, nullptr));
     std::vector<VkImage> swapchainImages;
     swapchainImages.resize(imageCount);
-
     VK_CHECK_RETURN(vkGetSwapchainImagesKHR(device, swapchain, &imageCount, swapchainImages.data()));
+
     std::vector<VkImageView> swapchainImageViews;
     swapchainImageViews.resize(imageCount);
+    for (auto i = 0; i < imageCount; i++) {
+        VkImageViewCreateInfo viewCI{ 
+            .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO, 
+            .image = swapchainImages[i], 
+            .viewType = VK_IMAGE_VIEW_TYPE_2D, 
+            .format = imageFormat, 
+            .subresourceRange{
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT, 
+                .levelCount = 1, 
+                .layerCount = 1 
+            } 
+        };
+        VK_CHECK_RETURN(vkCreateImageView(device, &viewCI, nullptr, &swapchainImageViews[i]));
+    }
 
-    std::vector<VkFormat> depthFormatList{ VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT };
+    // Swapchain depth attachment
+    std::vector<VkFormat> depthFormatList{ 
+        VK_FORMAT_D32_SFLOAT_S8_UINT, 
+        VK_FORMAT_D24_UNORM_S8_UINT 
+    };
+
     VkFormat depthFormat{ VK_FORMAT_UNDEFINED };
     for (VkFormat& format : depthFormatList) {
         VkFormatProperties2 formatProperties{ .sType = VK_STRUCTURE_TYPE_FORMAT_PROPERTIES_2 };
@@ -170,11 +200,20 @@ bool RenderDevice::Initialize(const Window& window) {
         }
     }
 
+    if (depthFormat == VK_FORMAT_UNDEFINED) {
+        std::println("No supported depth format found");
+        return false;
+    }
+
     VkImageCreateInfo depthImageCI{
         .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
         .imageType = VK_IMAGE_TYPE_2D,
         .format = depthFormat,
-        .extent{.width = window.GetWidth(), .height = window.GetHeight(), .depth = 1},
+        .extent{
+            .width = window.GetWidth(), 
+            .height = window.GetHeight(), 
+            .depth = 1
+        },
         .mipLevels = 1,
         .arrayLayers = 1,
         .samples = VK_SAMPLE_COUNT_1_BIT,
@@ -196,7 +235,11 @@ bool RenderDevice::Initialize(const Window& window) {
         .image = depthImage,
         .viewType = VK_IMAGE_VIEW_TYPE_2D,
         .format = depthFormat,
-        .subresourceRange{.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT, .levelCount = 1, .layerCount = 1 }
+        .subresourceRange{
+            .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT, 
+            .levelCount = 1, 
+            .layerCount = 1 
+        }
     };
     VkImageView depthImageView;
     VK_CHECK_RETURN(vkCreateImageView(device, &depthViewCI, nullptr, &depthImageView));
