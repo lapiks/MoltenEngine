@@ -7,7 +7,7 @@ struct EngineConfig {
 
 class Engine {
 public:
-	void Initialize(const Window& window, const EngineConfig& config);
+	bool Initialize(const Window& window, const EngineConfig& config);
 	void Shutdown();
 	void Update();
 	void Render();

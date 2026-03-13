@@ -1,8 +1,12 @@
 #include "Engine.h"
 #include "Platform/Window.h"
 
-void Engine::Initialize(const Window& window, const EngineConfig& config) {
-	m_renderDevice.Initialize(window);
+bool Engine::Initialize(const Window& window, const EngineConfig& config) {
+	if (!m_renderDevice.Initialize(window)) {
+		return false;
+	}
+
+	return true;
 }
 
 void Engine::Shutdown() {

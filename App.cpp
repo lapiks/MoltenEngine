@@ -15,7 +15,9 @@ int App::Run()
     EngineConfig config;
 
     Engine engine;
-    engine.Initialize(window, config);
+    if (!engine.Initialize(window, config)) {
+        return EXIT_FAILURE;
+    }
 
     while (!window.ShouldClose()) {
         window.PollEvents();
