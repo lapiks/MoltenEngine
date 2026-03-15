@@ -7,7 +7,7 @@ project(
 )
 
 add_executable(MoltenEngine 
-    "main.cpp" "App.cpp" "Platform/Window.h" "Platform/Window.cpp" "Engine/Engine.h" "Engine/Engine.cpp"   "Physics/PhysicsSystem.h" "Render/RenderSystem.h" "Core/Time.h" "Core/Time.cpp" "Render/RenderDevice.h" "Render/RenderDevice.cpp")
+    "main.cpp" "App.cpp" "Platform/Window.h" "Platform/Window.cpp" "Physics/PhysicsSystem.h" "Render/RenderSystem.h" "Core/Time.h" "Core/Time.cpp" "Render/RenderDevice.h" "Render/RenderDevice.cpp" "Game/Game.h" "Game/Game.cpp")
 
 set_target_properties(MoltenEngine PROPERTIES
     CXX_STANDARD 23

@@ -1,14 +1,11 @@
 #include "Core/Time.h"
 #include "Render/RenderDevice.h"
 
-struct EngineConfig {
-	
-};
-
-class Engine {
+class Game {
 public:
-	bool Initialize(const Window& window, const EngineConfig& config);
+	bool Initialize(const Window& window);
 	void Shutdown();
+
 	void Update();
 	void Render();
 
